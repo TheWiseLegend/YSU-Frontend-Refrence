@@ -155,13 +155,16 @@
                     *ngIf="place.imageUrl && !hasImageError(place.id)"
                 />
                 <div class="place-image-fallback" *ngIf="!place.imageUrl || hasImageError(place.id)">
-                    {{ getTypeIcon(place.categoryName) }}
+                    <svg [lucideIcon]="getPlaceIcon(place)" width="36" height="36"></svg>
                 </div>
                 </div>
                 <div class="place-info">
                     <h4>{{ place.name }}</h4>
                     <div class="place-meta">
-                        <span class="place-type">{{ getTypeIcon(place.categoryName) }} {{ place.categoryName }}</span>
+                        <span class="place-type">
+                          <svg [lucideIcon]="getPlaceIcon(place)" width="14" height="14"></svg>
+                          {{ place.categoryName }}
+                        </span>
                         <span class="place-location" *ngIf="place.location">{{ place.location }}</span>
                     </div>
                     <span class="place-discount">{{ place.discount }}</span>

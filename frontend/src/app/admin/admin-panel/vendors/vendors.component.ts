@@ -1,53 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  LucideDynamicIcon,
-  LucideUtensils,
-  LucideShoppingCart,
-  LucideGlobe,
-  LucideGraduationCap,
-  LucideCoffee,
-  LucideHeart,
-  LucideDumbbell,
-  LucideShirt,
-  LucideCar,
-  LucideStore,
-  provideLucideIcons,
-  LucideIcon,
-} from '@lucide/angular';
+import { LucideDynamicIcon, provideLucideIcons, LucideIcon } from '@lucide/angular';
 import { VendorService } from '../../../services/vendor.service';
 import { UploadService } from '../../../services/upload.service';
 import { Vendor, VendorCategory } from '../../../models/vendor.model';
-
-export interface IconOption {
-  key: string;
-  label: string;
-  icon: LucideIcon;
-}
-
-export const VENDOR_ICONS: IconOption[] = [
-  { key: 'utensils',       label: 'مطعم',      icon: LucideUtensils },
-  { key: 'shopping-cart',  label: 'بقالة',      icon: LucideShoppingCart },
-  { key: 'globe',          label: 'سياحة',      icon: LucideGlobe },
-  { key: 'graduation-cap', label: 'تعليم',      icon: LucideGraduationCap },
-  { key: 'coffee',         label: 'مقهى',       icon: LucideCoffee },
-  { key: 'heart',          label: 'صحة',        icon: LucideHeart },
-  { key: 'dumbbell',       label: 'رياضة',      icon: LucideDumbbell },
-  { key: 'shirt',          label: 'ملابس',      icon: LucideShirt },
-  { key: 'car',            label: 'مواصلات',    icon: LucideCar },
-  { key: 'store',          label: 'متجر',       icon: LucideStore },
-];
+import { VENDOR_ICONS, VendorIconOption, ALL_VENDOR_LUCIDE_ICONS, getVendorIcon } from '../../../data/vendor-icons';
 
 @Component({
   selector: 'app-admin-vendors',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, LucideDynamicIcon],
   providers: [
-    provideLucideIcons(
-      LucideUtensils, LucideShoppingCart, LucideGlobe, LucideGraduationCap,
-      LucideCoffee, LucideHeart, LucideDumbbell, LucideShirt, LucideCar, LucideStore
-    ),
+    provideLucideIcons(...ALL_VENDOR_LUCIDE_ICONS),
   ],
   templateUrl: './vendors.component.html',
   styleUrls: ['./vendors.component.scss'],
@@ -73,7 +38,7 @@ export class AdminVendorsComponent implements OnInit {
   showCategoryForm = false;
 
   // ─── Icon picker ─────────────────────────────────────────────────────────────
-  readonly availableIcons: IconOption[] = VENDOR_ICONS;
+  readonly availableIcons: VendorIconOption[] = VENDOR_ICONS;
   showIconPicker = false;
 
   // ─── Shared ──────────────────────────────────────────────────────────────────
@@ -240,12 +205,12 @@ export class AdminVendorsComponent implements OnInit {
 
   getSelectedIconData(): LucideIcon | null {
     const key = this.categoryForm.get('icon')?.value;
-    return this.availableIcons.find(i => i.key === key)?.icon ?? null;
+    return getVendorIcon(key);
   }
 
   getIconDataByKey(key: string | null | undefined): LucideIcon | null {
     if (!key) return null;
-    return this.availableIcons.find(i => i.key === key)?.icon ?? null;
+    return getVendorIcon(key);
   }
 
   onCategorySubmit(): void {

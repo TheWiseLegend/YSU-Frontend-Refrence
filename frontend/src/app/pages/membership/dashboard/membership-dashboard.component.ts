@@ -2,16 +2,19 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { LucideDynamicIcon, provideLucideIcons, LucideIcon } from '@lucide/angular';
 import { MembershipService } from '../../../services/membership.service';
 import { MemberAuthService } from '../../../services/member-auth.service';
 import { VendorService } from '../../../services/vendor.service';
 import { Member, MembershipApplication } from '../../../models/member.model';
 import { PublicVendor } from '../../../models/vendor.model';
+import { ALL_VENDOR_LUCIDE_ICONS, getVendorIcon } from '../../../data/vendor-icons';
 
 @Component({
   selector: 'app-membership-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideDynamicIcon],
+  providers: [provideLucideIcons(...ALL_VENDOR_LUCIDE_ICONS)],
   templateUrl: './membership-dashboard.component.html',
   styleUrls: ['./membership-dashboard.component.scss'],
 })
@@ -91,7 +94,7 @@ export class MembershipDashboardComponent implements OnInit {
 
     this.typeOptions = [
       { value: '', label: 'جميع الأنواع' },
-      ...types.map((t) => ({ value: t, label: `${this.getTypeIcon(t)} ${t}` })),
+      ...types.map((t) => ({ value: t, label: t })),
     ];
   }
 
@@ -190,6 +193,10 @@ export class MembershipDashboardComponent implements OnInit {
       تعليم: '📚',
     };
     return icons[type] ?? '🏪';
+  }
+
+  getPlaceIcon(place: PublicVendor): LucideIcon {
+    return getVendorIcon(place.categoryIcon);
   }
 
   onImageError(event: Event, vendorId: string): void {
