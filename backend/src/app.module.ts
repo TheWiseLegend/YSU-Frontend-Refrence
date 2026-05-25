@@ -19,6 +19,7 @@ import { AdminMembersModule } from './admin-members/admin-members.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MembershipCronModule } from './membership-cron/membership-cron.module';
 import { EmailModule } from './email/email.module';
+import { VerifyModule } from './verify/verify.module';
 import { VendorModule } from './vendor/vendor.module';
 
 
@@ -44,6 +45,7 @@ import { VendorModule } from './vendor/vendor.module';
     ScheduleModule.forRoot(),
     MembershipCronModule,
     EmailModule,
+    VerifyModule,
     VendorModule,
   ],
   controllers: [AppController],

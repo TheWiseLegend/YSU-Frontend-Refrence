@@ -7,6 +7,9 @@ import { MembershipService } from '../../../services/membership.service';
 import { MemberAuthService } from '../../../services/member-auth.service';
 import { VendorService } from '../../../services/vendor.service';
 import { Member, MembershipApplication } from '../../../models/member.model';
+import { DISCOUNTED_PLACES } from '../../../data/discounted-places';
+import { DiscountedPlace } from '../../../models/discounted-place.model';
+import QRCode from 'qrcode';
 import { PublicVendor } from '../../../models/vendor.model';
 import { ALL_VENDOR_LUCIDE_ICONS, getVendorIcon } from '../../../data/vendor-icons';
 
@@ -23,6 +26,7 @@ export class MembershipDashboardComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   showSettings = false;
+  qrCodeDataUrl: string = '';
 
   // Vendors
   allPlaces: PublicVendor[] = [];
@@ -50,6 +54,8 @@ export class MembershipDashboardComponent implements OnInit {
       next: (member) => {
         this.member = member;
         this.isLoading = false;
+        this.applyFilters();
+        this.generateQrCode();
       },
       error: () => {
         this.memberAuthService.logout();
@@ -58,6 +64,16 @@ export class MembershipDashboardComponent implements OnInit {
     });
 
     this.loadVendors();
+  }
+
+  private async generateQrCode(): Promise<void> {
+    if (!this.member?.membershipId) return;
+    const verifyUrl = `${window.location.origin}/verify/${this.member.membershipId}`;
+    this.qrCodeDataUrl = await QRCode.toDataURL(verifyUrl, {
+      width: 200,
+      margin: 2,
+      color: { dark: '#2E3F6E', light: '#FFFFFF' }
+    });
   }
 
   loadVendors(): void {
@@ -115,7 +131,7 @@ export class MembershipDashboardComponent implements OnInit {
       pending: 'قيد المراجعة',
       active: 'نشط',
       expired: 'منتهي',
-      cancelled: 'ملغي',
+      cancelled: 'ملغي'
     };
     return map[this.currentStatus] ?? '';
   }
@@ -126,17 +142,15 @@ export class MembershipDashboardComponent implements OnInit {
       pending: 'status-pending',
       active: 'status-active',
       expired: 'status-expired',
-      cancelled: 'status-cancelled',
+      cancelled: 'status-cancelled'
     };
     return map[this.currentStatus] ?? '';
   }
 
   get showCTA(): boolean {
-    return (
-      this.currentStatus === 'new' ||
+    return this.currentStatus === 'new' ||
       this.currentStatus === 'expired' ||
-      this.currentStatus === 'cancelled'
-    );
+      this.currentStatus === 'cancelled';
   }
 
   get memberInitials(): string {
