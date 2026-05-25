@@ -179,6 +179,7 @@ export class VendorService {
       discount: vendor.discount,
       imageUrl: vendor.imageUrl,
       mapsUrl: vendor.mapsUrl,
+      createdAt: vendor.createdAt,
     };
   }
 
@@ -205,6 +206,7 @@ export class VendorService {
         discount: v.discount,
         imageUrl: v.imageUrl,
         mapsUrl: v.mapsUrl,
+        createdAt: v.createdAt,
       }));
     } catch {
       return [];
