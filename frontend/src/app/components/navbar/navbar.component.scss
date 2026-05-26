@@ -346,6 +346,16 @@
   display: flex;
   align-items: center;
 
+  // Invisible extension below the button to bridge the gap to the menu
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 12px; // covers the gap between button and menu
+  }
+
   &:hover .more-menu {
     visibility: visible;
     opacity: 1;
@@ -395,6 +405,17 @@
   transition: opacity 0.2s, visibility 0.2s;
   display: flex !important;
   flex-direction: column !important;
+
+  // Invisible bridge fills the gap between button and menu
+  // so the mouse doesn't leave the hover zone while moving down
+  &::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+  }
 
   li {
     margin: 0 !important;

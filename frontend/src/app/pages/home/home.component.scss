@@ -4,17 +4,17 @@
 
 .hero-section {
   position: relative;
-  height: calc(100dvh + 80px); // +80px compensates for the negative margin-top
+  height: calc(100dvh + 80px);
   min-height: calc(640px + 80px);
   width: 100%;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
-  margin-top: -80px; // slide under the fixed navbar — eliminates the gap
+  margin-top: -80px;
 
   @media (max-width: 480px) {
-    height: calc(100svh + 70px); // mobile navbar is 70px
-    min-height: calc(580px + 70px);
+    height: calc(100dvh + 70px);
+    min-height: calc(560px + 70px);
     margin-top: -70px;
   }
 }

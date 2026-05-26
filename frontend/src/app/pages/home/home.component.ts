@@ -215,12 +215,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private animateStats(): void {
-    const duration = 1800;
+    const duration = 200;
     const start = performance.now();
 
     const tick = (now: number) => {
       const progress = Math.min(1, (now - start) / duration);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
 
       this.stats = this.stats.map(s => ({
