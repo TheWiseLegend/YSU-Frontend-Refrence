@@ -202,7 +202,7 @@
 
       <!-- Places Grid -->
       <div class="places-grid" *ngIf="!isLoadingVendors && !vendorsError">
-        
+
         <ng-container *ngFor="let place of filteredPlaces">
             <a [routerLink]="['/membership/vendor', place.id]" class="place-card">
                 <div class="place-image">
