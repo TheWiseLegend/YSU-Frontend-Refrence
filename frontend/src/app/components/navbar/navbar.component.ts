@@ -1,6 +1,10 @@
 import { Component, HostListener, ViewEncapsulation } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
+
+// Routes where the navbar should always be solid (no dark hero behind it)
+const SOLID_NAV_ROUTES = ['/verify', '/contact', '/digital-library'];
 
 @Component({
   selector: 'app-navbar',
@@ -15,6 +19,15 @@ export class NavbarComponent {
   isMoreOpen = false;
   isMobileMoreOpen = false;
   isScrolled = false;
+  forceSolid = false;
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => {
+      this.forceSolid = SOLID_NAV_ROUTES.some(r => e.urlAfterRedirects.startsWith(r));
+    });
+  }
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
