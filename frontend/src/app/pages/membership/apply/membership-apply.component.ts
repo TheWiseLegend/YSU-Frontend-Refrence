@@ -9,7 +9,7 @@ import { MembershipService } from '../../../services/membership.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './membership-apply.component.html',
-  styleUrls: ['./membership-apply.component.scss']
+  styleUrls: ['./membership-apply.component.scss'],
 })
 export class MembershipApplyComponent implements OnInit {
   isLoading = false;
@@ -28,6 +28,7 @@ export class MembershipApplyComponent implements OnInit {
   graduationYear: number | null = null;
   enrollmentLetterFile: File | null = null;
   receiptFile: File | null = null;
+  dataAgreement = false;
 
   enrollmentLetterPreview = '';
   receiptPreview = '';
@@ -44,7 +45,7 @@ export class MembershipApplyComponent implements OnInit {
     'Universiti Tenaga Nasional (UNITEN)',
     'Universiti Cyberjaya (UC)',
     'Asia Pacific University (APU)',
-    'Taylor\'s University',
+    "Taylor's University",
     'Sunway University',
     'INTI International University',
     'Limkokwing University',
@@ -71,20 +72,23 @@ export class MembershipApplyComponent implements OnInit {
 
   constructor(
     private membershipService: MembershipService,
-    private router: Router
+    private router: Router,
   ) {}
 
-    ngOnInit(): void {
+  ngOnInit(): void {
     this.membershipService.getMe().subscribe({
-        next: (member) => {
+      next: (member) => {
         const latest = member.applications?.[0];
-        if (latest && (latest.status === 'active' || latest.status === 'pending')) {
-            this.router.navigate(['/membership/dashboard']);
+        if (
+          latest &&
+          (latest.status === 'active' || latest.status === 'pending')
+        ) {
+          this.router.navigate(['/membership/dashboard']);
         }
-        },
-        error: () => this.router.navigate(['/membership/login'])
+      },
+      error: () => this.router.navigate(['/membership/login']),
     });
-    }
+  }
 
   onFileChange(event: Event, field: 'enrollmentLetter' | 'receipt'): void {
     const input = event.target as HTMLInputElement;
@@ -101,38 +105,54 @@ export class MembershipApplyComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.passportNumber || !this.phone || !this.gender || !this.address ||
-        !this.university || !this.studentId || !this.fieldOfStudy ||
-        !this.yearOfStudy || !this.graduationYear ||
-        !this.enrollmentLetterFile || !this.receiptFile) {
+    if (
+      !this.passportNumber ||
+      !this.phone ||
+      !this.gender ||
+      !this.address ||
+      !this.university ||
+      !this.studentId ||
+      !this.fieldOfStudy ||
+      !this.yearOfStudy ||
+      !this.graduationYear ||
+      !this.enrollmentLetterFile ||
+      !this.receiptFile
+    ) {
       this.errorMessage = 'يرجى ملء جميع الحقول وتحميل الملفات المطلوبة';
+      return;
+    }
+
+    if (!this.dataAgreement) {
+      this.errorMessage = 'يجب الموافقة على إقرار صحة البيانات قبل إرسال الطلب';
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.membershipService.apply({
-      passportNumber: this.passportNumber,
-      phone: this.phone,
-      gender: this.gender,
-      address: this.address,
-      university: this.university,
-      studentId: this.studentId,
-      fieldOfStudy: this.fieldOfStudy,
-      yearOfStudy: this.yearOfStudy!,
-      graduationYear: this.graduationYear!,
-      enrollmentLetter: this.enrollmentLetterFile!,
-      receipt: this.receiptFile!,
-    }).subscribe({
-      next: () => {
-        this.isSubmitted = true;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = err;
-        this.isLoading = false;
-      }
-    });
+    this.membershipService
+      .apply({
+        passportNumber: this.passportNumber,
+        phone: this.phone,
+        gender: this.gender,
+        address: this.address,
+        university: this.university,
+        studentId: this.studentId,
+        fieldOfStudy: this.fieldOfStudy,
+        yearOfStudy: this.yearOfStudy!,
+        graduationYear: this.graduationYear!,
+        enrollmentLetter: this.enrollmentLetterFile!,
+        receipt: this.receiptFile!,
+      })
+      .subscribe({
+        next: () => {
+          this.isSubmitted = true;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.errorMessage = err;
+          this.isLoading = false;
+        },
+      });
   }
 }
