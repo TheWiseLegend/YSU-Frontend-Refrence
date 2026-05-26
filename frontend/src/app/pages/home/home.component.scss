@@ -4,16 +4,20 @@
 
 .hero-section {
   position: relative;
+  // Desktop: dvh works fine
   height: calc(100dvh + 80px);
-  min-height: calc(640px + 80px);
+  min-height: calc(600px + 80px);
   width: 100%;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
   margin-top: -80px;
+  margin-bottom: -1px;
 
-  @media (max-width: 480px) {
-    height: calc(100dvh + 70px);
+  @media (max-width: 768px) {
+    // Mobile: use the CSS variable set by JS (actual window.innerHeight)
+    // Falls back to 100svh if JS hasn't run yet
+    height: calc(var(--vh, 1svh) * 100 + 70px);
     min-height: calc(560px + 70px);
     margin-top: -70px;
   }

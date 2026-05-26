@@ -76,6 +76,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.preloadImages();
     this.loadUpcomingEvents();
     this.loadLatestNews();
+    this.setVhVariable();
   }
 
   ngAfterViewInit(): void {
@@ -88,6 +89,16 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ── Slider ──────────────────────────────────────────────────
+  // Set --vh to actual window.innerHeight so mobile hero fills the screen
+  setVhVariable(): void {
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    setVh();
+    window.addEventListener('resize', setVh);
+  }
+
   preloadImages(): void {
     this.slides.forEach(s => {
       const img = new Image();
