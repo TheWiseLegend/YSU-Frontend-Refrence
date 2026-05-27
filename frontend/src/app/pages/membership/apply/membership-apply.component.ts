@@ -105,6 +105,7 @@ export class MembershipApplyComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Empty fields
     if (
       !this.passportNumber ||
       !this.phone ||
@@ -122,6 +123,23 @@ export class MembershipApplyComponent implements OnInit {
       return;
     }
 
+    // Passport: letters + numbers only, 6–20 chars
+    const passportRegex = /^[A-Za-z0-9]{6,20}$/;
+    if (!passportRegex.test(this.passportNumber.trim())) {
+      this.errorMessage =
+        'رقم جواز السفر غير صحيح (6–20 حرف أو رقم، بدون مسافات أو رموز)';
+      return;
+    }
+
+    // Phone: Malaysian format +60XXXXXXXXX or 0XXXXXXXXX
+    const phoneRegex = /^(\+?60|0)[0-9]{8,11}$/;
+    if (!phoneRegex.test(this.phone.trim())) {
+      this.errorMessage =
+        'رقم الهاتف غير صحيح — مثال: +60123456789 أو 0123456789';
+      return;
+    }
+
+    // Agreement
     if (!this.dataAgreement) {
       this.errorMessage = 'يجب الموافقة على إقرار صحة البيانات قبل إرسال الطلب';
       return;
