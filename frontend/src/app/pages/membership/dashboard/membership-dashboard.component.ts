@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideDynamicIcon, provideLucideIcons, LucideIcon } from '@lucide/angular';
@@ -16,7 +16,7 @@ import { ALL_VENDOR_LUCIDE_ICONS, getVendorIcon } from '../../../data/vendor-ico
 @Component({
   selector: 'app-membership-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideDynamicIcon],
+  imports: [CommonModule, RouterModule, FormsModule, LucideDynamicIcon, DatePipe],
   providers: [provideLucideIcons(...ALL_VENDOR_LUCIDE_ICONS)],
   templateUrl: './membership-dashboard.component.html',
   styleUrls: ['./membership-dashboard.component.scss'],
@@ -51,6 +51,13 @@ export class MembershipDashboardComponent implements OnInit {
   ];
 
   imageErrors: Set<string> = new Set();
+
+  // Decorative QR pattern (shown while real QR loads)
+  readonly qrPattern = [
+    1,1,1,0,1,1,1, 1,0,1,1,0,0,1, 1,0,1,0,1,1,1,
+    0,1,1,1,0,1,0, 1,0,0,1,1,0,1, 0,1,1,0,1,0,1,
+    1,1,1,0,0,1,1,
+  ];
 
   constructor(
     private membershipService: MembershipService,
