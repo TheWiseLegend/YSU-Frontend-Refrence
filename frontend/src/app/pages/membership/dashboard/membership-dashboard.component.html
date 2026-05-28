@@ -20,8 +20,11 @@
             <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span class="settings-btn__name">{{ memberInitials }}</span>
-          <div class="member-avatar">{{ memberInitials }}</div>
+          <span class="settings-btn__name" *ngIf="!member?.profileImageUrl">{{ memberInitials }}</span>
+          <div class="member-avatar">
+            <img *ngIf="member?.profileImageUrl" [src]="member!.profileImageUrl" alt="صورة شخصية" class="member-avatar__img" />
+            <span *ngIf="!member?.profileImageUrl">{{ memberInitials }}</span>
+          </div>
         </button>
 
         <div class="settings-dropdown" *ngIf="showSettings">
@@ -30,6 +33,13 @@
             <p class="dropdown-id">{{ member?.membershipId }}</p>
           </div>
           <hr />
+          <button class="dropdown-item" (click)="openChangeProfileModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                fill="currentColor"/>
+            </svg>
+            تغيير الصورة الشخصية
+          </button>
           <button class="dropdown-item logout" (click)="logout()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"

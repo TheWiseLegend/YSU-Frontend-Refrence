@@ -99,6 +99,13 @@
   font-size: 0.85rem;
   color: white;
   flex-shrink: 0;
+  overflow: hidden;
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .settings-dropdown {
@@ -142,7 +149,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: #4a5568;
 
+  &:hover { background: #f7fafc; }
   &.logout { color: #e53e3e; &:hover { background: #fff5f5; } }
 }
 

@@ -326,6 +326,15 @@ export class MembershipDashboardComponent implements OnInit {
     this.profileUploadError = '';
   }
 
+  openChangeProfileModal(): void {
+    this.showSettings = false;
+    this.profileUploadError = '';
+    this.profileImageFile = null;
+    // Show current profile as the preview
+    this.profileImagePreview = this.member?.profileImageUrl ?? null;
+    this.showProfileModal = true;
+  }
+
   // ─── Helpers ─────────────────────────────────────────────────────────────────
 
   getPlaceIcon(place: PublicVendor): LucideIcon {
