@@ -269,6 +269,51 @@
   }
 }
 
+.phone-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--light-gray);
+  color: var(--secondary-color);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  svg { flex-shrink: 0; }
+
+  &:hover {
+    border-color: var(--primary-color);
+    background: rgba(81, 116, 185, 0.08);
+    color: var(--primary-color);
+  }
+
+  &--copied {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+
+    &:hover {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+  }
+}
+
 // ─── Notes ───────────────────────────────────────────────────────────────────
 
 .vendor-notes {

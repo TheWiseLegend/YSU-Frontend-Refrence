@@ -340,7 +340,49 @@
     }
   }
 
+  &__phone-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
   &__sub { font-size: 0.72rem; color: rgba(81,116,185,0.6); margin-top: 3px; }
+}
+
+.copy-phone-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #e5eaf2;
+  background: white;
+  color: #5174b9;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+
+  &:hover {
+    border-color: #5174b9;
+    background: rgba(81, 116, 185, 0.08);
+  }
+
+  &--copied {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+
+    &:hover {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+    }
+  }
 }
 
 // ─── Notes ────────────────────────────────────────────────────────────────────

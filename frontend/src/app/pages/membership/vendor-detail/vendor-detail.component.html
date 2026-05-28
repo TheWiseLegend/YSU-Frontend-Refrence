@@ -197,7 +197,16 @@
             </div>
             <div class="meta-tile__content">
               <div class="meta-tile__label">رقم الهاتف</div>
-              <a [href]="'tel:' + vendor.phone" class="meta-tile__value meta-tile__value--phone" dir="ltr">{{ vendor.phone }}</a>
+              <div class="meta-tile__phone-row">
+                <a [href]="'tel:' + vendor.phone" class="meta-tile__value meta-tile__value--phone" dir="ltr">{{ vendor.phone }}</a>
+                <button
+                  class="copy-phone-btn"
+                  [class.copy-phone-btn--copied]="phoneCopied"
+                  (click)="copyPhone(vendor.phone)"
+                  type="button">
+                  {{ phoneCopied ? '✓ تم النسخ' : 'نسخ' }}
+                </button>
+              </div>
             </div>
           </div>
 

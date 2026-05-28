@@ -21,6 +21,7 @@ export class VendorDetailComponent implements OnInit {
   vendor: PublicVendor | undefined;
   isLoading = true;
   notFound = false;
+  phoneCopied = false;
 
   // Lightbox
   lightboxUrl: string | null = null;
@@ -69,6 +70,13 @@ export class VendorDetailComponent implements OnInit {
     if (this.vendor?.mapsUrl) {
       window.open(this.vendor.mapsUrl, '_blank');
     }
+  }
+
+  copyPhone(phone: string): void {
+    navigator.clipboard.writeText(phone).then(() => {
+      this.phoneCopied = true;
+      setTimeout(() => this.phoneCopied = false, 2000);
+    });
   }
 
   // ─── Lightbox ────────────────────────────────────────────────────────────────

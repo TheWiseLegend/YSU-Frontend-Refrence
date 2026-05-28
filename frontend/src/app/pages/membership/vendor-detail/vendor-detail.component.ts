@@ -24,6 +24,7 @@ export class MembershipVendorDetailComponent implements OnInit, OnDestroy {
   isLoading = true;
   notFound = false;
   showSettings = false;
+  phoneCopied = false;
 
   // ─── Slider ──────────────────────────────────────────────────────────────────
   activeSlide = 0;
@@ -191,6 +192,13 @@ export class MembershipVendorDetailComponent implements OnInit, OnDestroy {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('ar-MY', {
       year: 'numeric', month: 'long', day: 'numeric',
+    });
+  }
+
+  copyPhone(phone: string): void {
+    navigator.clipboard.writeText(phone).then(() => {
+      this.phoneCopied = true;
+      setTimeout(() => (this.phoneCopied = false), 2000);
     });
   }
 }
