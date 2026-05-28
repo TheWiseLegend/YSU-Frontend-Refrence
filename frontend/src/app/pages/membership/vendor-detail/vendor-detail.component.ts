@@ -25,6 +25,10 @@ export class MembershipVendorDetailComponent implements OnInit {
   notFound = false;
   showSettings = false;
 
+  // ─── Slider ──────────────────────────────────────────────────────────────────
+  activeSlide = 0;
+  private touchStartX = 0;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -56,6 +60,7 @@ export class MembershipVendorDetailComponent implements OnInit {
         this.vendor = vendor;
         this.notFound = false;
         this.isLoading = false;
+        this.activeSlide = 0;
         document.title = `${vendor.name} - اتحاد الطلبة اليمنيين في ماليزيا`;
       },
       error: () => {
@@ -65,6 +70,49 @@ export class MembershipVendorDetailComponent implements OnInit {
       },
     });
   }
+
+  // ─── Slider helpers ───────────────────────────────────────────────────────────
+
+  get sliderImages(): string[] {
+    if (!this.vendor) return [];
+    const gallery = (this.vendor.images ?? []).map(i => i.url);
+    // If no gallery images, fall back to the main logo
+    return gallery.length > 0 ? gallery : (this.vendor.imageUrl ? [this.vendor.imageUrl] : []);
+  }
+
+  prevSlide(): void {
+    const len = this.sliderImages.length;
+    this.activeSlide = (this.activeSlide - 1 + len) % len;
+  }
+
+  nextSlide(): void {
+    this.activeSlide = (this.activeSlide + 1) % this.sliderImages.length;
+  }
+
+  goToSlide(index: number): void {
+    this.activeSlide = index;
+  }
+
+  onTouchStart(e: TouchEvent): void {
+    this.touchStartX = e.touches[0].clientX;
+  }
+
+  onTouchEnd(e: TouchEvent): void {
+    const delta = this.touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) {
+      delta > 0 ? this.nextSlide() : this.prevSlide();
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(e: KeyboardEvent): void {
+    if (this.vendor && this.sliderImages.length > 1) {
+      if (e.key === 'ArrowLeft') this.nextSlide();
+      if (e.key === 'ArrowRight') this.prevSlide();
+    }
+  }
+
+  // ─── Other helpers ────────────────────────────────────────────────────────────
 
   get memberInitials(): string {
     const parts = (this.member?.fullNameAr ?? '').trim().split(' ');
@@ -96,5 +144,12 @@ export class MembershipVendorDetailComponent implements OnInit {
   logout(): void {
     this.memberAuthService.logout();
     this.router.navigate(['/membership/login']);
+  }
+
+  formatExpiryDate(dateStr: string | null): string {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('ar-MY', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
   }
 }
