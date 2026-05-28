@@ -242,6 +242,39 @@
     flex-wrap: wrap;
   }
 
+  &__profile-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__photo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__photo-icon {
+    width: 44px;
+    height: 44px;
+    opacity: 0.7;
+  }
+
   &__badge-ysu {
     width: 32px;
     height: 32px;
@@ -266,20 +299,20 @@
   }
 
   &__status-pill {
-    margin-right: auto;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
+    gap: 6px;
+    padding: 6px 14px;
     border-radius: 999px;
-    font-size: 0.7rem;
+    font-size: 0.82rem;
     font-weight: 700;
+    margin-top: 0.5rem;
 
-    &.status-active   { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); color: #6ee7b7; }
-    &.status-pending  { background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); color: #fde68a; }
-    &.status-expired  { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: #fca5a5; }
-    &.status-cancelled{ background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: #fca5a5; }
-    &.status-new      { background: rgba(147,197,253,0.15); border: 1px solid rgba(147,197,253,0.3); color: #bfdbfe; }
+    &.status-active   { background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); color: #6ee7b7; }
+    &.status-pending  { background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.4); color: #fde68a; }
+    &.status-expired  { background: rgba(248,113,113,0.2); border: 1px solid rgba(248,113,113,0.4); color: #fca5a5; }
+    &.status-cancelled{ background: rgba(248,113,113,0.2); border: 1px solid rgba(248,113,113,0.4); color: #fca5a5; }
+    &.status-new      { background: rgba(147,197,253,0.2); border: 1px solid rgba(147,197,253,0.4); color: #bfdbfe; }
   }
 
   &__role { font-size: 0.75rem; color: rgba(255,255,255,0.55); margin-bottom: 0.25rem; font-weight: 500; }
@@ -346,21 +379,6 @@
   &__qr-placeholder { width: 100%; height: 100%; }
 
   &__qr-label { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-align: center; }
-
-  &__strip {
-    position: relative;
-    padding: 0.75rem 2.5rem;
-    background: rgba(0,0,0,0.2);
-    backdrop-filter: blur(4px);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: monospace;
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.05em;
-  }
 }
 
 // QR art placeholder
@@ -838,4 +856,6 @@
 @media (max-width: 480px) {
   .member-card__qr-side { display: none; }
   .member-card__meta { grid-template-columns: 1fr; }
+  .member-card__profile-row { gap: 0.75rem; }
+  .member-card__photo { width: 56px; height: 56px; }
 }

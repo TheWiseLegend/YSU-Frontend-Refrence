@@ -77,17 +77,29 @@
             <div class="member-card__top-row">
               <div class="member-card__badge-ysu">YSU</div>
               <div class="member-card__subtitle">Membership · Malaysia</div>
-              <div class="member-card__status-pill" [ngClass]="statusClass">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                {{ statusLabel }}
-              </div>
             </div>
 
-            <div class="member-card__role">عضو الاتحاد</div>
-            <h2 class="member-card__name">{{ member.fullNameAr }}</h2>
+            <!-- Profile photo + name row -->
+            <div class="member-card__profile-row">
+              <div class="member-card__photo">
+                <!-- Placeholder: swap src for real photo URL when available -->
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="member-card__photo-icon">
+                  <circle cx="24" cy="18" r="9" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+                  <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="member-card__role">عضو الاتحاد</div>
+                <h2 class="member-card__name">{{ member.fullNameAr }}</h2>
+                <div class="member-card__status-pill" [ngClass]="statusClass">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {{ statusLabel }}
+                </div>
+              </div>
+            </div>
 
             <div class="member-card__meta">
               <div class="member-card__meta-item">
@@ -116,12 +128,6 @@
             </div>
             <div class="member-card__qr-label">امسح للتحقق من العضوية</div>
           </div>
-        </div>
-
-        <!-- Bottom chip strip -->
-        <div class="member-card__strip">
-          <span>ATHAD AL-TALABA AL-YAMANIYIN</span>
-          <span>•••• {{ member.membershipId.slice(-4) }}</span>
         </div>
       </div>
     </section>
