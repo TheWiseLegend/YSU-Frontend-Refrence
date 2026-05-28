@@ -93,14 +93,15 @@ enum MembershipStatus {
 }
 
 model Member {
-  id           String   @id @default(cuid())
-  membershipId String   @unique
-  email        String   @unique
-  password     String
-  fullNameAr   String
-  fullNameEn   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(cuid())
+  membershipId    String   @unique
+  email           String   @unique
+  password        String
+  fullNameAr      String
+  fullNameEn      String
+  profileImageUrl String?  @db.VarChar(500)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   applications MembershipApplication[]
 }
