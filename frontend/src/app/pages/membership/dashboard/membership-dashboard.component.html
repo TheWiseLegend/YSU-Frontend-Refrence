@@ -255,37 +255,64 @@
           <!-- Collapsible dropdowns -->
           <div class="filter-bar__dropdowns" [class.filter-bar__dropdowns--open]="showFilters">
             <!-- Location -->
-            <div class="filter-bar__select-wrap">
-              <span class="filter-bar__chevron">▼</span>
-              <select [(ngModel)]="selectedLocation" (ngModelChange)="applyFilters()" class="filter-bar__select">
-                <option *ngFor="let opt of locationOptions" [value]="opt.value">{{ opt.label }}</option>
-              </select>
-            </div>
+            <ng-select
+              [(ngModel)]="selectedLocation"
+              (ngModelChange)="applyFilters()"
+              [items]="locationOptions"
+              bindLabel="label"
+              bindValue="value"
+              [searchable]="false"
+              [clearable]="false"
+              placeholder="جميع المناطق"
+              class="filter-select"
+              appendTo="body"
+              dir="rtl">
+            </ng-select>
 
             <!-- Category -->
-            <div class="filter-bar__select-wrap">
-              <span class="filter-bar__chevron">▼</span>
-              <select [(ngModel)]="selectedType" (ngModelChange)="applyFilters()" class="filter-bar__select">
-                <option *ngFor="let opt of typeOptions" [value]="opt.value">{{ opt.label }}</option>
-              </select>
-            </div>
+            <ng-select
+              [(ngModel)]="selectedType"
+              (ngModelChange)="applyFilters()"
+              [items]="typeOptions"
+              bindLabel="label"
+              bindValue="value"
+              [searchable]="false"
+              [clearable]="false"
+              placeholder="جميع الأنواع"
+              class="filter-select"
+              appendTo="body"
+              dir="rtl">
+            </ng-select>
 
             <!-- Discount range -->
-            <div class="filter-bar__select-wrap">
-              <span class="filter-bar__chevron">▼</span>
-              <select [(ngModel)]="discountRange" (ngModelChange)="applyFilters()" class="filter-bar__select">
-                <option *ngFor="let opt of discountRangeOptions" [value]="opt.value">{{ opt.label }}</option>
-              </select>
-            </div>
+            <ng-select
+              [(ngModel)]="discountRange"
+              (ngModelChange)="applyFilters()"
+              [items]="discountRangeOptions"
+              bindLabel="label"
+              bindValue="value"
+              [searchable]="false"
+              [clearable]="false"
+              placeholder="جميع الخصومات"
+              class="filter-select"
+              appendTo="body"
+              dir="rtl">
+            </ng-select>
 
             <!-- Sort -->
-            <div class="filter-bar__select-wrap">
-              <span class="filter-bar__chevron">▼</span>
-              <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()" class="filter-bar__select">
-                <option value="">الترتيب الافتراضي</option>
-                <option value="recent">الأحدث أولاً</option>
-              </select>
-            </div>
+            <ng-select
+              [(ngModel)]="sortBy"
+              (ngModelChange)="applyFilters()"
+              [items]="sortOptions"
+              bindLabel="label"
+              bindValue="value"
+              [searchable]="false"
+              [clearable]="false"
+              placeholder="الترتيب الافتراضي"
+              class="filter-select"
+              appendTo="body"
+              dir="rtl">
+            </ng-select>
           </div>
 
           <div class="filter-bar__clear-row" *ngIf="activeFilterCount > 0">

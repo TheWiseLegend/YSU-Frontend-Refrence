@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideDynamicIcon, provideLucideIcons, LucideIcon } from '@lucide/angular';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { MembershipService } from '../../../services/membership.service';
 import { MemberAuthService } from '../../../services/member-auth.service';
 import { VendorService } from '../../../services/vendor.service';
@@ -16,7 +17,7 @@ import { ALL_VENDOR_LUCIDE_ICONS, getVendorIcon } from '../../../data/vendor-ico
 @Component({
   selector: 'app-membership-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideDynamicIcon, DatePipe],
+  imports: [CommonModule, RouterModule, FormsModule, LucideDynamicIcon, DatePipe, NgSelectModule],
   providers: [provideLucideIcons(...ALL_VENDOR_LUCIDE_ICONS)],
   templateUrl: './membership-dashboard.component.html',
   styleUrls: ['./membership-dashboard.component.scss'],
@@ -48,6 +49,11 @@ export class MembershipDashboardComponent implements OnInit {
     { value: '11-20', label: '١١٪ – ٢٠٪' },
     { value: '21-50', label: '٢١٪ – ٥٠٪' },
     { value: '50+',   label: 'أكثر من ٥٠٪' },
+  ];
+
+  readonly sortOptions = [
+    { value: '',       label: 'الترتيب الافتراضي' },
+    { value: 'recent', label: 'الأحدث أولاً' },
   ];
 
   imageErrors: Set<string> = new Set();
