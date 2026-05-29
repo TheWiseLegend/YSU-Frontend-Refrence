@@ -9,6 +9,15 @@ export interface MemberLoginResponse {
   token_type: string;
 }
 
+export interface PendingVerificationResponse {
+  status: 'pending_verification';
+  message: string;
+}
+
+export type RegisterResponse =
+  | MemberLoginResponse
+  | PendingVerificationResponse;
+
 export interface RegisterRequest {
   email: string;
   password: string;
@@ -18,7 +27,7 @@ export interface RegisterRequest {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MemberAuthService {
   private apiUrl = environment.apiUrl;
@@ -26,7 +35,7 @@ export class MemberAuthService {
 
   constructor(private http: HttpClient) {}
 
-  register(data: RegisterRequest): Observable<MemberLoginResponse> {
+  register(data: RegisterRequest): Observable<RegisterResponse> {
     const formData = new FormData();
     formData.append('email', data.email);
     formData.append('password', data.password);
@@ -36,26 +45,48 @@ export class MemberAuthService {
       formData.append('profileImage', data.profileImage);
     }
 
-    return this.http.post<MemberLoginResponse>(`${this.apiUrl}/member-auth/register`, formData)
+    return this.http
+      .post<RegisterResponse>(`${this.apiUrl}/member-auth/register`, formData)
+      .pipe(catchError(this.handleError));
+    // Note: no tap here — we don't store token on register anymore.
+    // Token is only stored after OTP verification succeeds.
+  }
+
+  verifyOtp(email: string, otp: string): Observable<MemberLoginResponse> {
+    return this.http
+      .post<MemberLoginResponse>(`${this.apiUrl}/member-auth/verify-otp`, {
+        email,
+        otp,
+      })
       .pipe(
-        tap(response => {
-          // Clear any existing admin session before storing member token
+        tap((response) => {
           localStorage.removeItem('admin_token');
           this.setToken(response.access_token);
         }),
-        catchError(this.handleError)
+        catchError(this.handleError),
       );
   }
 
+  resendOtp(email: string): Observable<{ message: string }> {
+    return this.http
+      .post<{
+        message: string;
+      }>(`${this.apiUrl}/member-auth/resend-otp`, { email })
+      .pipe(catchError(this.handleError));
+  }
+
   login(email: string, password: string): Observable<MemberLoginResponse> {
-    return this.http.post<MemberLoginResponse>(`${this.apiUrl}/member-auth/login`, { email, password })
+    return this.http
+      .post<MemberLoginResponse>(`${this.apiUrl}/member-auth/login`, {
+        email,
+        password,
+      })
       .pipe(
-        tap(response => {
-          // Clear any existing admin session before storing member token
+        tap((response) => {
           localStorage.removeItem('admin_token');
           this.setToken(response.access_token);
         }),
-        catchError(this.handleError)
+        catchError(this.handleError),
       );
   }
 
@@ -77,8 +108,18 @@ export class MemberAuthService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'حدث خطأ غير متوقع';
-    if (error.status === 401) errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-    else if (error.status === 409) errorMessage = 'البريد الإلكتروني مستخدم بالفعل';
+    if (error.status === 401) {
+      if (error.error?.message === 'email_not_verified') {
+        errorMessage = 'email_not_verified';
+      } else if (error.error?.message === 'رمز التحقق غير صحيح') {
+        errorMessage = 'رمز التحقق غير صحيح';
+      } else {
+        errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+      }
+    } else if (error.status === 409)
+      errorMessage = 'البريد الإلكتروني مستخدم بالفعل';
+    else if (error.status === 400)
+      errorMessage = error.error?.message || 'بيانات غير صحيحة';
     else if (error.status === 0) errorMessage = 'خطأ في الاتصال بالخادم';
     else if (error.error?.message) errorMessage = error.error.message;
     return throwError(() => errorMessage);

@@ -2,11 +2,13 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
+import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto, MemberLoginDto } from './dto';
 
@@ -17,24 +19,40 @@ export class MemberAuthService {
     private jwt: JwtService,
     private config: ConfigService,
     private localStorageService: LocalStorageService,
+    private emailService: EmailService,
   ) {}
 
-  async register(dto: RegisterDto, profileImageFile?: Express.Multer.File | null) {
-    // Check if email already exists
+  async register(
+    dto: RegisterDto,
+    profileImageFile?: Express.Multer.File | null,
+  ) {
     const existing = await this.prisma.member.findUnique({
       where: { email: dto.email },
     });
     if (existing) {
+      if (!existing.isEmailVerified) {
+        const otpCode = this.generateOtp();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        await this.prisma.member.update({
+          where: { email: dto.email },
+          data: { otpCode, otpExpiresAt },
+        });
+        this.emailService.sendOtpEmail({
+          toEmail: existing.email,
+          fullNameAr: existing.fullNameAr,
+          otpCode,
+        });
+        return {
+          status: 'pending_verification',
+          message: 'تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.',
+        };
+      }
       throw new ConflictException('البريد الإلكتروني مستخدم بالفعل');
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    // Generate unique membershipId: YSU + 5 digits
     const membershipId = await this.generateMembershipId();
 
-    // Upload profile image if provided
     let profileImageUrl: string | null = null;
     if (profileImageFile) {
       profileImageUrl = await this.localStorageService.uploadImage(
@@ -43,7 +61,9 @@ export class MemberAuthService {
       );
     }
 
-    // Create member
+    const otpCode = this.generateOtp();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
     const member = await this.prisma.member.create({
       data: {
         email: dto.email,
@@ -52,11 +72,90 @@ export class MemberAuthService {
         fullNameEn: dto.fullNameEn,
         membershipId,
         profileImageUrl,
+        isEmailVerified: false,
+        otpCode,
+        otpExpiresAt,
       },
     });
 
-    // Return token
+    // Send OTP email — non-blocking (don't await, don't fail register if email fails)
+    this.emailService.sendOtpEmail({
+      toEmail: member.email,
+      fullNameAr: member.fullNameAr,
+      otpCode,
+    });
+
+    return {
+      status: 'pending_verification',
+      message:
+        'تم إنشاء الحساب. يرجى التحقق من بريدك الإلكتروني وإدخال الرمز المرسل.',
+    };
+  }
+
+  async verifyOtp(email: string, otp: string) {
+    const member = await this.prisma.member.findUnique({ where: { email } });
+
+    if (!member) {
+      throw new UnauthorizedException('البريد الإلكتروني غير موجود');
+    }
+
+    if (member.isEmailVerified) {
+      throw new BadRequestException('البريد الإلكتروني محقق مسبقاً');
+    }
+
+    if (!member.otpCode || !member.otpExpiresAt) {
+      throw new BadRequestException('لا يوجد رمز تحقق نشط. اطلب رمزاً جديداً.');
+    }
+
+    if (new Date() > member.otpExpiresAt) {
+      throw new BadRequestException(
+        'انتهت صلاحية رمز التحقق. اطلب رمزاً جديداً.',
+      );
+    }
+
+    if (member.otpCode !== otp) {
+      throw new UnauthorizedException('رمز التحقق غير صحيح');
+    }
+
+    // OTP valid — mark verified and clear OTP fields
+    await this.prisma.member.update({
+      where: { email },
+      data: {
+        isEmailVerified: true,
+        otpCode: null,
+        otpExpiresAt: null,
+      },
+    });
+
     return this.signToken(member.id, member.email, member.membershipId);
+  }
+
+  async resendOtp(email: string) {
+    const member = await this.prisma.member.findUnique({ where: { email } });
+
+    if (!member) {
+      throw new UnauthorizedException('البريد الإلكتروني غير موجود');
+    }
+
+    if (member.isEmailVerified) {
+      throw new BadRequestException('البريد الإلكتروني محقق مسبقاً');
+    }
+
+    const otpCode = this.generateOtp();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await this.prisma.member.update({
+      where: { email },
+      data: { otpCode, otpExpiresAt },
+    });
+
+    this.emailService.sendOtpEmail({
+      toEmail: member.email,
+      fullNameAr: member.fullNameAr,
+      otpCode,
+    });
+
+    return { message: 'تم إرسال رمز التحقق الجديد إلى بريدك الإلكتروني.' };
   }
 
   async login(dto: MemberLoginDto) {
@@ -77,7 +176,16 @@ export class MemberAuthService {
       );
     }
 
+    // Block login if email is not verified
+    if (!member.isEmailVerified) {
+      throw new UnauthorizedException('email_not_verified');
+    }
+
     return this.signToken(member.id, member.email, member.membershipId);
+  }
+
+  private generateOtp(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   private async signToken(

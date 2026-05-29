@@ -102,7 +102,9 @@
   cursor: pointer;
   overflow: hidden;
   flex-shrink: 0;
-  transition: border-color 0.2s, transform 0.2s;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
 
   &:hover {
     border-color: var(--primary-color);
@@ -219,8 +221,13 @@
     transition: border-color 0.2s;
     box-sizing: border-box;
 
-    &:focus { outline: none; border-color: var(--primary-color); }
-    &:disabled { background: #f7fafc; }
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    &:disabled {
+      background: #f7fafc;
+    }
   }
 }
 
@@ -273,20 +280,30 @@
   justify-content: center;
   min-height: 48px;
 
-  &:hover:not(:disabled) { background: #3f5a8f; transform: translateY(-2px); }
-  &:disabled { opacity: 0.7; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    background: #3f5a8f;
+    transform: translateY(-2px);
+  }
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 }
 
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .auth-switch {
   text-align: center;
@@ -294,8 +311,14 @@
   color: #6c757d;
   font-size: 0.95rem;
 
-  a { color: var(--primary-color); font-weight: 600; text-decoration: none;
-    &:hover { text-decoration: underline; } }
+  a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .back-home {
@@ -305,7 +328,9 @@
   color: #a0aec0;
   font-size: 0.85rem;
   text-decoration: none;
-  &:hover { color: var(--primary-color); }
+  &:hover {
+    color: var(--primary-color);
+  }
 }
 
 @media (max-width: 480px) {
@@ -319,5 +344,72 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+  }
+}
+
+// ─── OTP Screen ──────────────────────────────────────────────────────────────
+
+.otp-group {
+  margin-bottom: 1.5rem;
+}
+
+.otp-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 12px;
+  text-align: center;
+  direction: ltr;
+  font-family: monospace;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+
+  &:disabled {
+    background: #f7fafc;
+  }
+}
+
+.success-message {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  color: #276749;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.resend-section {
+  text-align: center;
+  margin-top: 1.25rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 4px;
+  text-decoration: underline;
+
+  &:disabled {
+    color: #a0aec0;
+    cursor: not-allowed;
+    text-decoration: none;
   }
 }

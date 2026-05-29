@@ -6,9 +6,11 @@ import { MemberAuthService } from './member-auth.service';
 import { MemberJwtStrategy } from './strategy/member-jwt.strategy';
 import { MemberJwtGuard } from './guard/member-jwt.guard';
 import { LocalStorageModule } from '../local-storage/local-storage.module';
+import { EmailModule } from '../email/email.module';
+
 
 @Module({
-  imports: [PassportModule, JwtModule.register({}), LocalStorageModule],
+  imports: [PassportModule, JwtModule.register({}), LocalStorageModule, EmailModule],
   controllers: [MemberAuthController],
   providers: [MemberAuthService, MemberJwtStrategy, MemberJwtGuard],
   exports: [MemberJwtStrategy, MemberJwtGuard, JwtModule],

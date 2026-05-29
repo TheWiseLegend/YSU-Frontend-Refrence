@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -12,102 +12,73 @@ import { MemberAuthService } from '../../../services/member-auth.service';
   styleUrls: ['./membership-signup.component.scss'],
 })
 export class MembershipSignupComponent {
-  @ViewChild('profileInput') profileInput!: ElementRef<HTMLInputElement>;
-
-  fullNameAr = '';
-  fullNameEn = '';
+  // Form fields
   email = '';
   password = '';
   confirmPassword = '';
-  isLoading = false;
-  errorMessage = '';
-  dataAgreement = false;
-
-  // Profile image
+  fullNameAr = '';
+  fullNameEn = '';
   profileImageFile: File | null = null;
   profileImagePreview: string | null = null;
+  dataAgreement = false;
+
+  // UI state
+  isLoading = false;
+  errorMessage = '';
+
+  // OTP state
+  showOtpScreen = false;
+  pendingEmail = '';
+  otpValue = '';
+  otpSuccess = '';
+  resendCooldown = 0;
+  private resendInterval: any = null;
 
   constructor(
     private memberAuthService: MemberAuthService,
     private router: Router,
-  ) {}
-
-  private setError(message: string): void {
-    this.errorMessage = message;
-    setTimeout(() => {
-      document.querySelector('.error-message')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+  ) {
+    const nav = this.router.getCurrentNavigation();
+    const state = nav?.extras?.state as {
+      pendingEmail?: string;
+      showOtp?: boolean;
+    };
+    if (state?.showOtp && state?.pendingEmail) {
+      this.pendingEmail = state.pendingEmail;
+      this.showOtpScreen = true;
+    }
   }
 
   onProfileImageChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      this.setError('يرجى اختيار صورة بصيغة JPG أو PNG أو WebP');
-      input.value = '';
-      return;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      this.profileImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.profileImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
     }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      this.setError('حجم الصورة يجب أن لا يتجاوز 2 ميجابايت');
-      input.value = '';
-      return;
-    }
-
-    this.profileImageFile = file;
-    this.errorMessage = '';
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.profileImagePreview = reader.result as string;
-    };
-    reader.readAsDataURL(file);
   }
 
   removeProfileImage(): void {
     this.profileImageFile = null;
     this.profileImagePreview = null;
-    // Reset the file input so the same file can be re-selected
-    if (this.profileInput) {
-      this.profileInput.nativeElement.value = '';
-    }
+  }
+
+  private setError(msg: string): void {
+    this.errorMessage = msg;
   }
 
   onSubmit(): void {
-    this.errorMessage = '';
-
-    // Empty fields
-    if (
-      !this.fullNameAr ||
-      !this.fullNameEn ||
-      !this.email ||
-      !this.password ||
-      !this.confirmPassword
-    ) {
-      this.setError('يرجى ملء جميع الحقول');
-      return;
-    }
-
-    // Profile image required
-    if (!this.profileImageFile) {
-      this.setError('الصورة الشخصية مطلوبة');
-      return;
-    }
-
-    // Email format
+    // Validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
       this.setError('صيغة البريد الإلكتروني غير صحيحة');
       return;
     }
 
-    // Password strength: min 8 chars, 1 uppercase, 1 lowercase, 1 number
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(this.password)) {
       this.setError(
@@ -116,29 +87,23 @@ export class MembershipSignupComponent {
       return;
     }
 
-    // Password match
     if (this.password !== this.confirmPassword) {
       this.setError('كلمتا المرور غير متطابقتين');
       return;
     }
 
-    // Name: only Arabic letters allowed in Arabic name field
     const arabicRegex = /^[\u0600-\u06FF\s]+$/;
     if (!arabicRegex.test(this.fullNameAr.trim())) {
       this.setError('الاسم بالعربية يجب أن يحتوي على حروف عربية فقط');
       return;
     }
 
-    // Name: only English letters allowed in English name field
     const englishRegex = /^[a-zA-Z\s]+$/;
     if (!englishRegex.test(this.fullNameEn.trim())) {
-      this.setError(
-        'الاسم بالإنجليزية يجب أن يحتوي على حروف إنجليزية فقط',
-      );
+      this.setError('الاسم بالإنجليزية يجب أن يحتوي على حروف إنجليزية فقط');
       return;
     }
 
-    // Agreement checkbox
     if (!this.dataAgreement) {
       this.setError('يجب الموافقة على إقرار صحة البيانات');
       return;
@@ -156,11 +121,75 @@ export class MembershipSignupComponent {
         profileImage: this.profileImageFile,
       })
       .subscribe({
-        next: () => this.router.navigate(['/membership/dashboard']),
+        next: (response) => {
+          this.isLoading = false;
+          if (
+            'status' in response &&
+            response.status === 'pending_verification'
+          ) {
+            this.pendingEmail = this.email;
+            this.showOtpScreen = true;
+            this.errorMessage = '';
+          }
+        },
         error: (err) => {
           this.setError(err);
           this.isLoading = false;
         },
       });
+  }
+
+  onVerifyOtp(): void {
+    if (!this.otpValue || this.otpValue.length !== 6) {
+      this.errorMessage = 'يرجى إدخال رمز التحقق المكون من 6 أرقام';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.otpSuccess = '';
+
+    this.memberAuthService
+      .verifyOtp(this.pendingEmail, this.otpValue)
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/membership/dashboard']);
+        },
+        error: (err) => {
+          this.errorMessage = err;
+          this.isLoading = false;
+        },
+      });
+  }
+
+  onResendOtp(): void {
+    if (this.resendCooldown > 0) return;
+
+    this.memberAuthService.resendOtp(this.pendingEmail).subscribe({
+      next: () => {
+        this.otpSuccess = 'تم إرسال رمز جديد إلى بريدك الإلكتروني';
+        this.errorMessage = '';
+        this.startResendCooldown();
+      },
+      error: (err) => {
+        this.errorMessage = err;
+      },
+    });
+  }
+
+  private startResendCooldown(): void {
+    this.resendCooldown = 60;
+    this.resendInterval = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) {
+        clearInterval(this.resendInterval);
+        this.resendInterval = null;
+      }
+    }, 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.resendInterval) clearInterval(this.resendInterval);
   }
 }

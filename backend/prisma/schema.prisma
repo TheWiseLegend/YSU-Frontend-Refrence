@@ -60,7 +60,7 @@ model News {
   summary   String
   content   String
   imageUrl  String
-  createdAt DateTime  
+  createdAt DateTime
   updatedAt DateTime @updatedAt
 }
 
@@ -80,7 +80,7 @@ model UnionTeamMember {
   position  String
   type      String
   imageUrl  String
-  period    String   
+  period    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -99,9 +99,12 @@ model Member {
   password        String
   fullNameAr      String
   fullNameEn      String
-  profileImageUrl String?  @db.VarChar(500)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  profileImageUrl    String?  @db.VarChar(500)
+  isEmailVerified    Boolean  @default(false)
+  otpCode            String?  @db.VarChar(6)
+  otpExpiresAt       DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   applications MembershipApplication[]
 }
@@ -132,7 +135,7 @@ model MembershipApplication {
 
   cancellationReason String?
   cancelledAt       DateTime?
-  
+
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 }

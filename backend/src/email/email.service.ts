@@ -10,10 +10,15 @@ export class EmailService {
 
   constructor(private config: ConfigService) {
     this.resend = new Resend(this.config.get<string>('RESEND_API_KEY'));
-    this.fromEmail = this.config.get<string>('RESEND_FROM_EMAIL') ?? 'noreply@ysumalaysia.org';
+    this.fromEmail =
+      this.config.get<string>('RESEND_FROM_EMAIL') ?? 'noreply@ysumalaysia.org';
   }
 
-  private async sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  private async sendEmail(
+    to: string,
+    subject: string,
+    html: string,
+  ): Promise<boolean> {
     try {
       const { error } = await this.resend.emails.send({
         from: `الاتحاد العام للطلاب اليمنيين في ماليزيا <${this.fromEmail}>`,
@@ -87,7 +92,8 @@ export class EmailService {
     membershipId: string;
     expiresAt: string;
   }): Promise<boolean> {
-    const subject = 'تهانينا! تم قبول طلب عضويتك - الاتحاد العام للطلاب اليمنيين';
+    const subject =
+      'تهانينا! تم قبول طلب عضويتك - الاتحاد العام للطلاب اليمنيين';
     const content = `
       <h2 style="color: #4A7C4E; font-size: 18px; font-weight: 500; margin: 0 0 12px;">تهانينا! تمت الموافقة على عضويتك</h2>
       <p style="color: #444444; font-size: 15px; line-height: 1.7; margin: 0 0 12px;">
@@ -136,6 +142,35 @@ export class EmailService {
         يمكنك التواصل مع الإدارة للمزيد من التوضيح أو إعادة التقديم بعد تصحيح المعلومات المطلوبة.
       </p>
     `;
+    return this.sendEmail(params.toEmail, subject, this.baseTemplate(content));
+  }
+
+  async sendOtpEmail(params: {
+    toEmail: string;
+    fullNameAr: string;
+    otpCode: string;
+  }): Promise<boolean> {
+    const subject =
+      'رمز التحقق من البريد الإلكتروني - الاتحاد العام للطلاب اليمنيين';
+    const content = `
+    <h2 style="color: #2E3F6E; font-size: 18px; font-weight: 500; margin: 0 0 12px;">تحقق من بريدك الإلكتروني</h2>
+    <p style="color: #444444; font-size: 15px; line-height: 1.7; margin: 0 0 12px;">
+      عزيزي/عزيزتي <strong>${params.fullNameAr}</strong>،
+    </p>
+    <p style="color: #444444; font-size: 15px; line-height: 1.7; margin: 0 0 16px;">
+      شكراً لتسجيلك في بوابة عضوية الاتحاد. استخدم الرمز أدناه للتحقق من بريدك الإلكتروني.
+    </p>
+    <div style="background-color: #f0f4ff; border: 2px solid #2E3F6E; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 16px;">
+      <p style="margin: 0 0 8px; font-size: 13px; color: #666666;">رمز التحقق</p>
+      <p style="margin: 0; font-size: 36px; font-weight: 700; color: #2E3F6E; letter-spacing: 8px; font-family: monospace;">${params.otpCode}</p>
+    </div>
+    <p style="color: #888888; font-size: 13px; margin: 0 0 8px;">
+      ⏱ هذا الرمز صالح لمدة <strong>10 دقائق</strong> فقط.
+    </p>
+    <p style="color: #888888; font-size: 13px; margin: 0;">
+      إذا لم تقم بإنشاء هذا الحساب، يمكنك تجاهل هذه الرسالة.
+    </p>
+  `;
     return this.sendEmail(params.toEmail, subject, this.baseTemplate(content));
   }
 }

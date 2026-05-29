@@ -12,6 +12,21 @@ import { MemberAuthService } from './member-auth.service';
 import { RegisterDto, MemberLoginDto } from './dto';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+
+class VerifyOtpDto {
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  @Length(6, 6)
+  otp!: string;
+}
+
+class ResendOtpDto {
+  @IsEmail()
+  email!: string;
+}
 
 @Controller('member-auth')
 export class MemberAuthController {
@@ -83,4 +98,17 @@ export class MemberAuthController {
   login(@Body() dto: MemberLoginDto) {
     return this.memberAuthService.login(dto);
   }
+
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  verifyOtp(@Body() dto: VerifyOtpDto) {
+    return this.memberAuthService.verifyOtp(dto.email, dto.otp);
+  }
+
+  @Post('resend-otp')
+  @HttpCode(HttpStatus.OK)
+  resendOtp(@Body() dto: ResendOtpDto) {
+    return this.memberAuthService.resendOtp(dto.email);
+  }
+
 }

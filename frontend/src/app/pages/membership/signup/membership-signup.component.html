@@ -4,111 +4,241 @@
       <img src="/logo/ysu_logo_cropped.webp" alt="YSU Malaysia" />
     </div>
 
-    <h1 class="auth-title">إنشاء حساب</h1>
-    <p class="auth-subtitle">انضم إلى بوابة عضوية اتحاد الطلبة اليمنيين</p>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SIGNUP FORM (shown by default)             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <ng-container *ngIf="!showOtpScreen">
+      <h1 class="auth-title">إنشاء حساب</h1>
+      <p class="auth-subtitle">انضم إلى بوابة عضوية اتحاد الطلبة اليمنيين</p>
 
-    <div class="error-message" *ngIf="errorMessage" #errorBox>
-      <span>{{ errorMessage }}</span>
-    </div>
+      <div class="error-message" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+      </div>
 
-    <form (ngSubmit)="onSubmit()">
-      <!-- Profile Image Upload -->
-      <div class="profile-upload-section">
-        <label class="section-label">الصورة الشخصية <span class="required">*</span></label>
-        <div class="profile-upload-wrapper">
-          <div class="profile-upload-preview" (click)="profileInput.click()">
-            <img *ngIf="profileImagePreview" [src]="profileImagePreview" alt="صورة شخصية" />
-            <div class="profile-upload-placeholder" *ngIf="!profileImagePreview">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
-              </svg>
-              <span>اضغط لاختيار صورة</span>
-            </div>
-          </div>
-          <input
-            #profileInput
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            (change)="onProfileImageChange($event)"
-            [disabled]="isLoading"
-            style="display: none"
-          />
-          <div class="profile-upload-info">
-            <div class="profile-upload-example">
-              <div class="example-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
-                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <form (ngSubmit)="onSubmit()">
+        <!-- Profile Image Upload -->
+        <div class="profile-upload-section">
+          <label class="section-label"
+            >الصورة الشخصية <span class="required">*</span></label
+          >
+          <div class="profile-upload-wrapper">
+            <div class="profile-upload-preview" (click)="profileInput.click()">
+              <img
+                *ngIf="profileImagePreview"
+                [src]="profileImagePreview"
+                alt="صورة شخصية"
+              />
+              <div
+                class="profile-upload-placeholder"
+                *ngIf="!profileImagePreview"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                    fill="currentColor"
+                  />
                 </svg>
+                <span>اضغط لاختيار صورة</span>
               </div>
-              <p class="example-text">صورة شخصية واضحة للوجه بخلفية فاتحة</p>
             </div>
-            <p class="upload-hint">JPG, PNG أو WebP — الحد الأقصى 2 ميجابايت</p>
-            <button type="button" class="remove-photo-btn" *ngIf="profileImagePreview" (click)="removeProfileImage()">
-              إزالة الصورة
-            </button>
+            <input
+              #profileInput
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onProfileImageChange($event)"
+              [disabled]="isLoading"
+              style="display: none"
+            />
+            <div class="profile-upload-info">
+              <div class="profile-upload-example">
+                <div class="example-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle
+                      cx="12"
+                      cy="8"
+                      r="4"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <path
+                      d="M4 20c0-4 4-6 8-6s8 2 8 6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <p class="example-text">صورة شخصية واضحة للوجه بخلفية فاتحة</p>
+              </div>
+              <p class="upload-hint">
+                JPG, PNG أو WebP — الحد الأقصى 2 ميجابايت
+              </p>
+              <button
+                type="button"
+                class="remove-photo-btn"
+                *ngIf="profileImagePreview"
+                (click)="removeProfileImage()"
+              >
+                إزالة الصورة
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>الاسم الكامل بالعربية</label>
-          <input type="text" [(ngModel)]="fullNameAr" name="fullNameAr"
-            placeholder="أحمد محمد عبدالله" [disabled]="isLoading" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>الاسم الكامل بالعربية</label>
+            <input
+              type="text"
+              [(ngModel)]="fullNameAr"
+              name="fullNameAr"
+              placeholder="أحمد محمد عبدالله"
+              [disabled]="isLoading"
+            />
+          </div>
+          <div class="form-group">
+            <label>الاسم الكامل بالإنجليزية</label>
+            <input
+              type="text"
+              [(ngModel)]="fullNameEn"
+              name="fullNameEn"
+              placeholder="Ahmed Mohammed"
+              [disabled]="isLoading"
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label>الاسم الكامل بالإنجليزية</label>
-          <input type="text" [(ngModel)]="fullNameEn" name="fullNameEn"
-            placeholder="Ahmed Mohammed" [disabled]="isLoading" />
-        </div>
-      </div>
 
-      <div class="form-group">
-        <label>البريد الإلكتروني</label>
-        <input type="email" [(ngModel)]="email" name="email"
-          placeholder="example@email.com" [disabled]="isLoading" />
-      </div>
-
-      <div class="form-row">
         <div class="form-group">
-          <label>كلمة المرور</label>
-          <input type="password" [(ngModel)]="password" name="password"
-            placeholder="••••••••" [disabled]="isLoading" />
-        </div>
-        <div class="form-group">
-          <label>تأكيد كلمة المرور</label>
-          <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
-            placeholder="••••••••" [disabled]="isLoading" />
-        </div>
-      </div>
-
-      <!-- Agreement Checkbox -->
-      <div class="agreement-box">
-        <label class="agreement-label">
+          <label>البريد الإلكتروني</label>
           <input
-            type="checkbox"
-            [(ngModel)]="dataAgreement"
-            name="dataAgreement"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="example@email.com"
             [disabled]="isLoading"
           />
-          <span>
-            أقر بأن جميع البيانات المدخلة صحيحة وأتعهد بالالتزام بأنظمة ولوائح اتحاد الطلبة اليمنيين في ماليزيا.
-          </span>
-        </label>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>كلمة المرور</label>
+            <input
+              type="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="••••••••"
+              [disabled]="isLoading"
+            />
+          </div>
+          <div class="form-group">
+            <label>تأكيد كلمة المرور</label>
+            <input
+              type="password"
+              [(ngModel)]="confirmPassword"
+              name="confirmPassword"
+              placeholder="••••••••"
+              [disabled]="isLoading"
+            />
+          </div>
+        </div>
+
+        <div class="agreement-box">
+          <label class="agreement-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="dataAgreement"
+              name="dataAgreement"
+              [disabled]="isLoading"
+            />
+            <span>
+              أقر بأن جميع البيانات المدخلة صحيحة وأتعهد بالالتزام بأنظمة ولوائح
+              اتحاد الطلبة اليمنيين في ماليزيا.
+            </span>
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          class="auth-btn"
+          [disabled]="
+            isLoading ||
+            !dataAgreement ||
+            !fullNameAr ||
+            !fullNameEn ||
+            !email ||
+            !password ||
+            !confirmPassword ||
+            !profileImageFile
+          "
+        >
+          <span *ngIf="!isLoading">إنشاء الحساب</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        لديك حساب بالفعل؟
+        <a routerLink="/membership/login">تسجيل الدخول</a>
+      </p>
+
+      <a routerLink="/home" class="back-home">← العودة للموقع</a>
+    </ng-container>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- OTP VERIFICATION SCREEN                    -->
+    <!-- ═══════════════════════════════════════════ -->
+    <ng-container *ngIf="showOtpScreen">
+      <h1 class="auth-title">التحقق من البريد الإلكتروني</h1>
+      <p class="auth-subtitle">
+        تم إرسال رمز مكون من 6 أرقام إلى
+        <br />
+        <strong>{{ pendingEmail }}</strong>
+      </p>
+
+      <div class="error-message" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
       </div>
 
-      <button type="submit" class="auth-btn" [disabled]="isLoading || !dataAgreement || !fullNameAr || !fullNameEn || !email || !password || !confirmPassword || !profileImageFile">
-        <span *ngIf="!isLoading">إنشاء الحساب</span>
+      <div class="success-message" *ngIf="otpSuccess">
+        <span>{{ otpSuccess }}</span>
+      </div>
+
+      <div class="form-group otp-group">
+        <label>رمز التحقق</label>
+        <input
+          type="text"
+          [(ngModel)]="otpValue"
+          name="otpValue"
+          placeholder="● ● ● ● ● ●"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          class="otp-input"
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <button class="auth-btn" (click)="onVerifyOtp()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">تحقق من الرمز</span>
         <span *ngIf="isLoading" class="spinner"></span>
       </button>
-    </form>
 
-    <p class="auth-switch">
-      لديك حساب بالفعل؟
-      <a routerLink="/membership/login">تسجيل الدخول</a>
-    </p>
-
-    <a routerLink="/home" class="back-home">← العودة للموقع</a>
+      <p class="resend-section">
+        لم تصلك رسالة؟
+        <button
+          type="button"
+          class="resend-btn"
+          (click)="onResendOtp()"
+          [disabled]="resendCooldown > 0"
+        >
+          <ng-container *ngIf="resendCooldown === 0"
+            >إعادة الإرسال</ng-container
+          >
+          <ng-container *ngIf="resendCooldown > 0"
+            >إعادة الإرسال ({{ resendCooldown }})</ng-container
+          >
+        </button>
+      </p>
+    </ng-container>
   </div>
 </div>
