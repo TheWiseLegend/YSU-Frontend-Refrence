@@ -34,6 +34,10 @@
         />
       </div>
 
+      <p class="forgot-link">
+        <a routerLink="/membership/forgot-password">نسيت كلمة المرور؟</a>
+      </p>
+      
       <button type="submit" class="auth-btn" [disabled]="isLoading">
         <span *ngIf="!isLoading">تسجيل الدخول</span>
         <span *ngIf="isLoading" class="spinner"></span>

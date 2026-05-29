@@ -35,13 +35,13 @@ import { VerifyComponent } from './pages/verify/verify.component';
 import { AdminVendorsComponent } from './admin/admin-panel/vendors/vendors.component';
 import { MembershipVendorDetailComponent } from './pages/membership/vendor-detail/vendor-detail.component';
 
-
 import { MembershipLayoutComponent } from './pages/membership/layout/membership-layout.component';
 import { MembershipLoginComponent } from './pages/membership/login/membership-login.component';
 import { MembershipSignupComponent } from './pages/membership/signup/membership-signup.component';
 import { MembershipDashboardComponent } from './pages/membership/dashboard/membership-dashboard.component';
 import { MembershipApplyComponent } from './pages/membership/apply/membership-apply.component';
 import { MemberAuthGuard } from './guards/member-auth.guard';
+import { MembershipForgotPasswordComponent } from './pages/membership/forgot-password/membership-forgot-password.component';
 
 export const routes: Routes = [
   {
@@ -76,6 +76,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: 'login', component: MembershipLoginComponent },
       { path: 'signup', component: MembershipSignupComponent },
+      { path: 'forgot-password', component: MembershipForgotPasswordComponent },
       {
         path: 'dashboard',
         component: MembershipDashboardComponent,

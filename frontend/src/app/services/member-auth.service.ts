@@ -75,6 +75,42 @@ export class MemberAuthService {
       .pipe(catchError(this.handleError));
   }
 
+  requestPasswordReset(email: string): Observable<{ message: string }> {
+    return this.http
+      .post<{
+        message: string;
+      }>(`${this.apiUrl}/member-auth/forgot-password`, { email })
+      .pipe(catchError(this.handleError));
+  }
+
+  verifyResetCode(
+    email: string,
+    code: string,
+  ): Observable<{ verified: boolean; email: string }> {
+    return this.http
+      .post<{
+        verified: boolean;
+        email: string;
+      }>(`${this.apiUrl}/member-auth/verify-reset-code`, { email, code })
+      .pipe(catchError(this.handleError));
+  }
+
+  resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Observable<{ message: string }> {
+    return this.http
+      .post<{
+        message: string;
+      }>(`${this.apiUrl}/member-auth/reset-password`, {
+        email,
+        code,
+        newPassword,
+      })
+      .pipe(catchError(this.handleError));
+  }
+
   login(email: string, password: string): Observable<MemberLoginResponse> {
     return this.http
       .post<MemberLoginResponse>(`${this.apiUrl}/member-auth/login`, {
@@ -113,6 +149,8 @@ export class MemberAuthService {
         errorMessage = 'email_not_verified';
       } else if (error.error?.message === 'رمز التحقق غير صحيح') {
         errorMessage = 'رمز التحقق غير صحيح';
+      } else if (error.error?.message === 'رمز إعادة التعيين غير صحيح') {
+        errorMessage = 'رمز إعادة التعيين غير صحيح';
       } else {
         errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
       }

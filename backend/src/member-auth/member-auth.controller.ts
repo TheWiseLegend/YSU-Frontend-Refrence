@@ -28,6 +28,33 @@ class ResendOtpDto {
   email!: string;
 }
 
+class ForgotPasswordDto {
+  @IsEmail()
+  email!: string;
+}
+
+class VerifyResetCodeDto {
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  @Length(6, 6)
+  code!: string;
+}
+
+class ResetPasswordDto {
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  @Length(6, 6)
+  code!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  newPassword!: string;
+}
+
 @Controller('member-auth')
 export class MemberAuthController {
   constructor(private memberAuthService: MemberAuthService) {}
@@ -83,9 +110,7 @@ export class MemberAuthController {
 
       return await this.memberAuthService.register(dto, profileImageFile);
     } catch (error) {
-      if (
-        error instanceof BadRequestException
-      ) {
+      if (error instanceof BadRequestException) {
         throw error;
       }
       if (error.status) throw error;
@@ -111,4 +136,25 @@ export class MemberAuthController {
     return this.memberAuthService.resendOtp(dto.email);
   }
 
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.memberAuthService.requestPasswordReset(dto.email);
+  }
+
+  @Post('verify-reset-code')
+  @HttpCode(HttpStatus.OK)
+  verifyResetCode(@Body() dto: VerifyResetCodeDto) {
+    return this.memberAuthService.verifyResetCode(dto.email, dto.code);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.memberAuthService.resetPassword(
+      dto.email,
+      dto.code,
+      dto.newPassword,
+    );
+  }
 }

@@ -31,17 +31,39 @@ export class MemberAuthService {
     });
     if (existing) {
       if (!existing.isEmailVerified) {
+
+        // latest submission, so a user is never trapped by an old password.
+        const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+        let profileImageUrl = existing.profileImageUrl;
+        if (profileImageFile) {
+          profileImageUrl = await this.localStorageService.uploadImage(
+            profileImageFile,
+            'profile-photos',
+          );
+        }
+
         const otpCode = this.generateOtp();
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
         await this.prisma.member.update({
           where: { email: dto.email },
-          data: { otpCode, otpExpiresAt },
+          data: {
+            password: hashedPassword,
+            fullNameAr: dto.fullNameAr,
+            fullNameEn: dto.fullNameEn,
+            profileImageUrl,
+            otpCode,
+            otpExpiresAt,
+          },
         });
+
         this.emailService.sendOtpEmail({
           toEmail: existing.email,
-          fullNameAr: existing.fullNameAr,
+          fullNameAr: dto.fullNameAr,
           otpCode,
         });
+
         return {
           status: 'pending_verification',
           message: 'تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.',
@@ -156,6 +178,110 @@ export class MemberAuthService {
     });
 
     return { message: 'تم إرسال رمز التحقق الجديد إلى بريدك الإلكتروني.' };
+  }
+
+  async requestPasswordReset(email: string) {
+    const member = await this.prisma.member.findUnique({ where: { email } });
+
+    // Security: never reveal whether an email exists — return generic success.
+    if (!member) {
+      return {
+        message: 'إذا كان البريد الإلكتروني مسجلاً، سيصلك رمز إعادة التعيين.',
+      };
+    }
+
+    if (!member.isEmailVerified) {
+      return {
+        message: 'إذا كان البريد الإلكتروني مسجلاً، سيصلك رمز إعادة التعيين.',
+      };
+    }
+
+    const resetPasswordCode = this.generateOtp();
+    const resetPasswordExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+
+    await this.prisma.member.update({
+      where: { email },
+      data: { resetPasswordCode, resetPasswordExpiresAt },
+    });
+
+    // Non-blocking send — same fire-and-forget pattern as register()
+    this.emailService.sendPasswordResetEmail({
+      toEmail: member.email,
+      fullNameAr: member.fullNameAr,
+      resetCode: resetPasswordCode,
+    });
+
+    return {
+      message: 'إذا كان البريد الإلكتروني مسجلاً، سيصلك رمز إعادة التعيين.',
+    };
+  }
+
+  async verifyResetCode(email: string, code: string) {
+    const member = await this.prisma.member.findUnique({ where: { email } });
+
+    // Generic invalid message on not-found too — don't leak existence.
+    if (
+      !member ||
+      !member.resetPasswordCode ||
+      !member.resetPasswordExpiresAt
+    ) {
+      throw new UnauthorizedException('رمز إعادة التعيين غير صحيح');
+    }
+
+    if (new Date() > member.resetPasswordExpiresAt) {
+      throw new BadRequestException('انتهت صلاحية الرمز. اطلب رمزاً جديداً.');
+    }
+
+    if (member.resetPasswordCode !== code) {
+      throw new UnauthorizedException('رمز إعادة التعيين غير صحيح');
+    }
+
+    // Valid — do NOT clear fields here; clearing happens in resetPassword().
+    return { verified: true, email };
+  }
+
+  async resetPassword(email: string, code: string, newPassword: string) {
+    const member = await this.prisma.member.findUnique({ where: { email } });
+
+    // Re-validate the code — never trust that verifyResetCode() was called first.
+    if (
+      !member ||
+      !member.resetPasswordCode ||
+      !member.resetPasswordExpiresAt
+    ) {
+      throw new UnauthorizedException('رمز إعادة التعيين غير صحيح');
+    }
+
+    if (new Date() > member.resetPasswordExpiresAt) {
+      throw new BadRequestException('انتهت صلاحية الرمز. اطلب رمزاً جديداً.');
+    }
+
+    if (member.resetPasswordCode !== code) {
+      throw new UnauthorizedException('رمز إعادة التعيين غير صحيح');
+    }
+
+    // Same password regex as RegisterDto.
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      throw new BadRequestException(
+        'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، حرف كبير، حرف صغير، ورقم',
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.member.update({
+      where: { email },
+      data: {
+        password: hashedPassword,
+        resetPasswordCode: null,
+        resetPasswordExpiresAt: null,
+      },
+    });
+
+    return {
+      message: 'تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.',
+    };
   }
 
   async login(dto: MemberLoginDto) {

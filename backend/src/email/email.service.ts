@@ -173,4 +173,33 @@ export class EmailService {
   `;
     return this.sendEmail(params.toEmail, subject, this.baseTemplate(content));
   }
+
+  async sendPasswordResetEmail(params: {
+    toEmail: string;
+    fullNameAr: string;
+    resetCode: string;
+  }): Promise<boolean> {
+    const subject =
+      'رمز إعادة تعيين كلمة المرور - الاتحاد العام للطلاب اليمنيين';
+    const content = `
+    <h2 style="color: #2E3F6E; font-size: 18px; font-weight: 500; margin: 0 0 12px;">إعادة تعيين كلمة المرور</h2>
+    <p style="color: #444444; font-size: 15px; line-height: 1.7; margin: 0 0 12px;">
+      عزيزي/عزيزتي <strong>${params.fullNameAr}</strong>،
+    </p>
+    <p style="color: #444444; font-size: 15px; line-height: 1.7; margin: 0 0 16px;">
+      لقد تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك. استخدم الرمز أدناه لمتابعة العملية.
+    </p>
+    <div style="background-color: #f0f4ff; border: 2px solid #2E3F6E; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 16px;">
+      <p style="margin: 0 0 8px; font-size: 13px; color: #666666;">رمز إعادة التعيين</p>
+      <p style="margin: 0; font-size: 36px; font-weight: 700; color: #2E3F6E; letter-spacing: 8px; font-family: monospace;">${params.resetCode}</p>
+    </div>
+    <p style="color: #888888; font-size: 13px; margin: 0 0 8px;">
+      ⏱ هذا الرمز صالح لمدة <strong>10 دقائق</strong> فقط.
+    </p>
+    <p style="color: #888888; font-size: 13px; margin: 0;">
+      إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذه الرسالة وستبقى كلمة مرورك كما هي.
+    </p>
+  `;
+    return this.sendEmail(params.toEmail, subject, this.baseTemplate(content));
+  }
 }
