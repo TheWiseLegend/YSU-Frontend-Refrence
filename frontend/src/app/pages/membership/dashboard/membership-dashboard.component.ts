@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ import {
   ALL_VENDOR_LUCIDE_ICONS,
   getVendorIcon,
 } from '../../../data/vendor-icons';
+import { MembershipHeaderComponent } from '../shared/membership-header/membership-header.component';
 
 @Component({
   selector: 'app-membership-dashboard',
@@ -31,6 +32,7 @@ import {
     LucideDynamicIcon,
     DatePipe,
     NgSelectModule,
+    MembershipHeaderComponent,
   ],
   providers: [provideLucideIcons(...ALL_VENDOR_LUCIDE_ICONS)],
   templateUrl: './membership-dashboard.component.html',
@@ -40,7 +42,6 @@ export class MembershipDashboardComponent implements OnInit {
   member: Member | null = null;
   isLoading = true;
   errorMessage = '';
-  showSettings = false;
   qrCodeDataUrl: string = '';
 
   // Profile photo modal
@@ -216,13 +217,6 @@ export class MembershipDashboardComponent implements OnInit {
     );
   }
 
-  get memberInitials(): string {
-    const parts = (this.member?.fullNameAr ?? '').trim().split(' ');
-    return parts.length >= 2
-      ? parts[0][0] + parts[1][0]
-      : (parts[0]?.slice(0, 2) ?? '');
-  }
-
   // ─── Filter methods ──────────────────────────────────────────────────────────
 
   /** Extracts the first integer found in a discount string, e.g. "15%" → 15, "حتى 50%" → 50 */
@@ -367,7 +361,6 @@ export class MembershipDashboardComponent implements OnInit {
   }
 
   openChangeProfileModal(): void {
-    this.showSettings = false;
     this.profileUploadError = '';
     this.profileImageFile = null;
     // Show current profile as the preview
@@ -376,7 +369,6 @@ export class MembershipDashboardComponent implements OnInit {
   }
 
   openChangePasswordModal(): void {
-    this.showSettings = false;
     this.changePasswordError = '';
     this.changePasswordSuccess = '';
     this.cpCurrentPassword = '';
@@ -444,16 +436,6 @@ export class MembershipDashboardComponent implements OnInit {
 
   hasImageError(vendorId: string): boolean {
     return this.imageErrors.has(vendorId);
-  }
-
-  toggleSettings(event: Event): void {
-    event.stopPropagation();
-    this.showSettings = !this.showSettings;
-  }
-
-  @HostListener('document:click')
-  closeSettings(): void {
-    this.showSettings = false;
   }
 
   logout(): void {

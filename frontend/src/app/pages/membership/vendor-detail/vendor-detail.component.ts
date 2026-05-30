@@ -9,11 +9,12 @@ import { MembershipService } from '../../../services/membership.service';
 import { PublicVendor } from '../../../models/vendor.model';
 import { Member } from '../../../models/member.model';
 import { ALL_VENDOR_LUCIDE_ICONS, getVendorIcon } from '../../../data/vendor-icons';
+import { MembershipHeaderComponent } from '../shared/membership-header/membership-header.component';
 
 @Component({
   selector: 'app-membership-vendor-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideDynamicIcon],
+  imports: [CommonModule, RouterModule, LucideDynamicIcon, MembershipHeaderComponent],
   providers: [provideLucideIcons(...ALL_VENDOR_LUCIDE_ICONS)],
   templateUrl: './vendor-detail.component.html',
   styleUrls: ['./vendor-detail.component.scss'],
@@ -23,7 +24,6 @@ export class MembershipVendorDetailComponent implements OnInit, OnDestroy {
   member: Member | null = null;
   isLoading = true;
   notFound = false;
-  showSettings = false;
   phoneCopied = false;
 
   // ─── Slider ──────────────────────────────────────────────────────────────────
@@ -156,11 +156,6 @@ export class MembershipVendorDetailComponent implements OnInit, OnDestroy {
 
   // ─── Other helpers ────────────────────────────────────────────────────────────
 
-  get memberInitials(): string {
-    const parts = (this.member?.fullNameAr ?? '').trim().split(' ');
-    return parts.length >= 2 ? parts[0][0] + parts[1][0] : parts[0]?.slice(0, 2) ?? '';
-  }
-
   getCategoryIcon(key: string | null | undefined): LucideIcon {
     return getVendorIcon(key);
   }
@@ -171,21 +166,6 @@ export class MembershipVendorDetailComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.location.back();
-  }
-
-  toggleSettings(event: Event): void {
-    event.stopPropagation();
-    this.showSettings = !this.showSettings;
-  }
-
-  @HostListener('document:click')
-  closeSettings(): void {
-    this.showSettings = false;
-  }
-
-  logout(): void {
-    this.memberAuthService.logout();
-    this.router.navigate(['/membership/login']);
   }
 
   formatExpiryDate(dateStr: string | null): string {
